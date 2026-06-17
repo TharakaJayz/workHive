@@ -11,3 +11,81 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum UerRole {
+  ADMIN
+  EMPLOYER
+  JOB_SEEKER
+}
+
+enum JobType {
+  REMOTE
+  ONSITE
+  HYBRID
+}
+
+enum JobCategory {
+  IT
+  HR
+  HOSPITALITY
+  FINANCE
+  MEDICAL
+  EDUCATION
+  MARKETING
+  SALES
+}
+
+enum JobStatus {
+  FLAGGED
+  CLOSED
+  DELETED
+  ACTIVE
+}
+
+model User {
+  id             Int     @id @default(autoincrement())
+  email          String  @unique
+  full_name      String
+  email_verified Boolean
+  password       String
+  role           UerRole
+
+  applications Application[]
+  jobs         Job[]
+}
+
+model Application {
+  id           Int               @id @default(autoincrement())
+  job_id       Int
+  status       ApplicationStatus @default(PENDING)
+  resume_url   String
+  cover_letter String?
+  date_applied DateTime          @default(now())
+  user_id      Int
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [job_id], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id          Int         @id @default(autoincrement())
+  type        JobType
+  company     String
+  category    JobCategory
+  employer_id Int
+  salary_min  Int
+  salary_max  Int
+  location    String
+  title       String
+  description String
+  status      JobStatus   @default(ACTIVE)
+
+  user         User          @relation(fields: [employer_id], references: [id], onDelete: Cascade)
+  applications Application[]
+}
