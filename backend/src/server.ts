@@ -12,8 +12,25 @@ const PORT = process.env.PORT ?? 5000
 
 app.use(helmet());
 
-app.use(cors());
-app.use(morgan('dev')) 
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            const allowed = [
+                process.env.FRONTEND_URL,          
+                process.env.NGROK_URL,            
+            ].filter(Boolean)
+
+            
+            if (!origin || allowed.includes(origin)) return callback(null, true)
+
+            callback(new AppError(403, 'CORS_BLOCKED', `Origin ${origin} not allowed`))
+        },
+        credentials: true,
+    })
+)
+
+
+app.use(morgan('dev'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 // RATE LIMITER
