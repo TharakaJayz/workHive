@@ -1,3 +1,4 @@
+//SSR
 export default function JobDetailsPage (){
     return (
         <div>
