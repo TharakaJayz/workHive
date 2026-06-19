@@ -1,7 +1,7 @@
 import { AppError } from "../lib/AppError";
 import { jobRepository } from "../repositories/job.repository";
 import { userRepository } from "../repositories/user.repository";
-import { CreateJobInput } from "../schemas/job.schema";
+import { CreateJobInput, GetAllJobsInput, UpdateJobInput } from "../schemas/job.schema";
 
 export const jobService = {
     create: async (data: CreateJobInput, employerId: number) => {
@@ -99,4 +99,184 @@ export const jobService = {
 
         return job;
     },
+
+
+    update: async (
+        jobId: number,
+        data: UpdateJobInput,
+        userId: number
+    ) => {
+
+        console.log("[job.update] start", {
+            jobId,
+            userId,
+        });
+
+        //  Check job exists
+        const job = await jobRepository.findById(jobId);
+
+        if (!job) {
+            console.warn("[job.update ⛔️] job not found", { jobId });
+
+            throw new AppError(
+                404,
+                "JOB_NOT_FOUND",
+                "Job not found"
+            );
+        }
+
+        //  Check employer exists
+        const user = await userRepository.findById(userId);
+
+        if (!user) {
+            console.warn("[job.update ⛔️] user not found", { userId });
+
+            throw new AppError(
+                404,
+                "USER_NOT_FOUND",
+                "User not found"
+            );
+        }
+
+        //  Role check
+        if (user.role !== "EMPLOYER") {
+            console.warn("[job.update ⛔️] unauthorized role", {
+                userId,
+                role: user.role,
+            });
+
+            throw new AppError(
+                403,
+                "FORBIDDEN",
+                "Only employers can update jobs"
+            );
+        }
+
+        //  Ownership check
+        if (job.employer_id !== userId) {
+            console.warn("[job.update ⛔️] not owner", {
+                userId,
+                jobOwner: job.employer_id,
+            });
+
+            throw new AppError(
+                403,
+                "FORBIDDEN",
+                "You can only update your own jobs"
+            );
+        }
+
+        //  Prevent updating deleted jobs
+        if (job.status === "DELETED" || job.status === "FLAGGED") {
+            console.warn("[job.update ⛔️] deleted or flagged job update attempt", {
+                jobId,
+            });
+
+            throw new AppError(
+                400,
+                "INVALID_OPERATION",
+                "Cannot update deleted or flagged job"
+            );
+        }
+
+        // Salary validation (if provided)
+        if (data.salary_min && data.salary_max) {
+            if (data.salary_min > data.salary_max) {
+                console.warn("[job.update ⛔️] invalid salary range", {
+                    salary_min: data.salary_min,
+                    salary_max: data.salary_max,
+                });
+
+                throw new AppError(
+                    400,
+                    "INVALID_SALARY_RANGE",
+                    "Invalid salary range"
+                );
+            }
+        }
+
+
+        const updatedJob = await jobRepository.update(jobId, {
+            ...data,
+        });
+
+        console.log("[job.update ✅] success", {
+            jobId,
+        });
+
+        return updatedJob;
+    },
+
+    // get job by id 
+    // admin and related owner can see flagged jobs
+    getById: async (jobId: number, userId?: number | null, role?: string | null) => {
+
+        console.log("[job.getById] start", { jobId });
+
+
+        const job = await jobRepository.findById(jobId);
+
+        if (!job) {
+            console.warn("[job.getById ⛔️] job not found", { jobId });
+
+            throw new AppError(
+                404,
+                "JOB_NOT_FOUND",
+                "Job not found"
+            );
+        }
+
+        const isAdmin = role === "ADMIN";
+        const isOwner = job.employer_id === userId;
+
+        const isFlagged = job.status === "FLAGGED";
+
+     
+        // flagged job data only available for ADMIN or OWNER
+        if (isFlagged && !(isAdmin || isOwner)) {
+            console.warn("[job.getById ⛔️] flagged job access denied", {
+                jobId,
+                role,
+                userId,
+            });
+
+            throw new AppError(
+                403,
+                "FORBIDDEN",
+                "This job is restricted"
+            );
+        }
+
+        console.log("[job.getById ✅] success", { jobId });
+        return job;
+
+    },
+
+    getAllJobs: async (filters: GetAllJobsInput,userId?: number | null, role?: string | null) => {
+        console.log("[job.getAllJobs] start", filters);
+        const isAdmin = role === "ADMIN";
+        const jobs = await jobRepository.findAllJobs(filters);
+        const filteredJobs = jobs.filter((job) => {
+
+            const isOwner = job.employer_id === userId;
+
+            const isFlagged = job.status === "FLAGGED";
+
+            
+            // FLAGGED jobs only visible to ADMIN or OWNER
+            if (isFlagged && !(isAdmin || isOwner)) {
+                return false;
+            }
+
+            return true;
+        });
+
+        console.log("[job.getAllJobs ✅] success", {
+            count: filteredJobs.length,
+        });
+
+        return filteredJobs;
+    }
+
+
 };
