@@ -8,6 +8,7 @@ import Link from "next/link";
 import { registerUser } from "@/api-client";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const {
@@ -20,7 +21,7 @@ export default function RegisterPage() {
     mode: "onChange",
   });
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const onSubmit = async (data: RegisterFormData) => {
     console.log("FINAL DATA:", data);
 
@@ -28,6 +29,7 @@ export default function RegisterPage() {
       setLoading(true);
       const res = await registerUser(data);
       toast.success("Registration Sucessfull", { position: "top-right" });
+      router.push("/");
     } catch (error: any) {
       console.log("register error", error);
       toast.error(`Error:${error}`, { position: "top-right" });

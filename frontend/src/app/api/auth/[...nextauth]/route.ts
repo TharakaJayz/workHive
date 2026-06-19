@@ -27,8 +27,9 @@ export const authOptions: NextAuthOptions = {
         if (res.ok && responseBody?.success && responseBody?.data) {
           return {
             id: responseBody.data.user.id.toString(), 
-            name: responseBody.data.user.full_name,
+            full_name: responseBody.data.user.full_name,
             email: responseBody.data.user.email,
+            email_verified:responseBody.data.user.email_verified,
             role: responseBody.data.user.role,
             token: responseBody.data.token, 
           };
@@ -41,17 +42,23 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.token;
-        token.id = user.id;
+        token.id = +user.id;
+        token.full_name = user.full_name;
+        token.email = user.email ?? "";
+        token.email_verified = user.email_verified;
         token.role = user.role; 
+        token.accessToken = user.token;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.accessToken = token.accessToken;
         session.user.id = token.id;
+        session.user.full_name = token.full_name;
+        session.user.email = token.email;
+        session.user.email_verified = token.email_verified;
         session.user.role = token.role; 
+        session.user.accessToken = token.accessToken; 
       }
       return session;
     }

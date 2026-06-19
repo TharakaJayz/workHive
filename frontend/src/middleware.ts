@@ -10,12 +10,14 @@ export default withAuth(
 
     // 1. Protect employer routes
     if (path.startsWith("/employer") && token?.role === UserRole.JOB_SEEKER) {
-      return new NextResponse("Forbidden", { status: 403 });
+      console.log("wrong route reaches")
+      // return new NextResponse("Forbidden", { status: 403 });
+      return NextResponse.redirect(new URL("/forbidden", req.url));
     }
 
     // 2. Protect admin routes
     if (path.startsWith("/admin") && token?.role !== UserRole.ADMIN) {
-      return new NextResponse("Forbidden", { status: 403 });
+      return NextResponse.redirect(new URL("/forbidden", req.url));
     }
 
     return NextResponse.next();
@@ -28,5 +30,6 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/employer/:path*", "/admin/:path*"],
+  matcher: ["/dashboard/:path*","/employer/:path*",  "/admin/:path*"],
 };
+
