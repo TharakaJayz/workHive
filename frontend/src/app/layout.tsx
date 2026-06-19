@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
+import AuthProvider from "@/components/providers/AuthProvider";
+import LayoutWrapper from "@/components/custom/LayoutWrapper";
+import ReduxProvider from "@/components/providers/ReduxProvider";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +30,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", inter.variable)}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>
+          <ReduxProvider>
+            <LayoutWrapper>{children}</LayoutWrapper>
+          </ReduxProvider>
+        </AuthProvider>
+        <Toaster />
       </body>
     </html>
   );
