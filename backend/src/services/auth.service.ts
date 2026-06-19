@@ -5,21 +5,16 @@ import { RegisterUserInput, LoginUserInput } from "../schemas/auth.schema";
 import bcrypt from "bcryptjs";
 
 export const authService = {
-
-    register: async (data: RegisterUserInput) => {
-
+    register: async (input: RegisterUserInput) => {
         console.log("[auth.register] start", {
-            email: data.email,
-            role: data.role,
+            email: input.email,
+            role: input.role,
         });
-
-        const existing = await userRepository.findByEmail(data.email);
-
+        const existing = await userRepository.findByEmail(input.email);
         if (existing) {
-            console.warn("[auth.register ⛔️] email already in use", {
-                email: data.email,
+            console.warn("[auth.register ⛔️] email already in use ", {
+                email: input.email,
             });
-
             throw new AppError(
                 409,
                 "EMAIL_IN_USE",
@@ -27,21 +22,14 @@ export const authService = {
             );
         }
 
-        const passwordHash = await bcrypt.hash(data.password, 12);
-
+        const passwordHash = await bcrypt.hash(input.password, 12);
         const user = await userRepository.create({
-            ...data,
+            ...input,
             password: passwordHash,
         });
-
-        const token = signToken({
-            userId: user.id,
-            role: user.role,
-        });
-
+        const token = signToken({ userId: user.id, role: user.role });
         const { password: _pw, ...safeUser } = user;
-
-        console.log("[auth.register ✅] user created", {
+        console.log("[auth.register ✅] user created ", {
             userId: user.id,
             email: user.email,
         });
@@ -49,49 +37,34 @@ export const authService = {
         return { user: safeUser, token };
     },
 
-    login: async (data: LoginUserInput) => {
-
-        console.log("[auth.login] start", {
-            email: data.email,
-        });
-
+    login: async (input: LoginUserInput) => {
+        console.log("[auth.login] start", { email: input.email });
         const INVALID = new AppError(
             401,
             "INVALID_CREDENTIALS",
             "Email or password is incorrect"
         );
 
-        const user = await userRepository.findByEmail(data.email);
-
+        const user = await userRepository.findByEmail(input.email);
         if (!user) {
-            console.warn("[auth.login ⛔️] invalid credentials", {
-                email: data.email,
+            console.warn("[auth.login ⛔️] invalid credentials ", {
+                email: input.email,
             });
-
             throw INVALID;
         }
-
         const passwordMatch = await bcrypt.compare(
-            data.password,
+            input.password,
             user.password
         );
-
         if (!passwordMatch) {
-            console.warn("[auth.login ⛔️] invalid credentials", {
-                email: data.email,
+            console.warn("[auth.login ⛔️] invalid credentials ", {
+                email: input.email,
             });
-
             throw INVALID;
         }
-
-        const token = signToken({
-            userId: user.id,
-            role: user.role,
-        });
-
+        const token = signToken({ userId: user.id, role: user.role });
         const { password: _pw, ...safeUser } = user;
-
-        console.log("[auth.login ✅] success", {
+        console.log("[auth.login ✅] success ", {
             userId: user.id,
             email: user.email,
         });

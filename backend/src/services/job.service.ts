@@ -4,9 +4,7 @@ import { userRepository } from "../repositories/user.repository";
 import { CreateJobInput } from "../schemas/job.schema";
 
 export const jobService = {
-
     create: async (data: CreateJobInput, employerId: number) => {
-
         console.log("[job.create] start", {
             employerId,
             title: data.title,
@@ -18,11 +16,7 @@ export const jobService = {
         if (!employer) {
             console.warn("[job.create ⛔️] employer not found", { employerId });
 
-            throw new AppError(
-                404,
-                "USER_NOT_FOUND",
-                "Employer not found"
-            );
+            throw new AppError(404, "USER_NOT_FOUND", "Employer not found");
         }
 
         //  Check role
@@ -105,5 +99,4 @@ export const jobService = {
 
         return job;
     },
-
 };

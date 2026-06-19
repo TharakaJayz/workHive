@@ -1,10 +1,7 @@
-
-
 import { Prisma, Job } from "../../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 
 export const jobRepository = {
-
     create: (data: Prisma.JobCreateInput): Promise<Job> => {
         return prisma.job.create({ data });
     },
@@ -32,7 +29,6 @@ export const jobRepository = {
         company: string;
         employerId: number;
     }): Promise<Job | null> => {
-
         return prisma.job.findFirst({
             where: {
                 title: params.title,
@@ -41,5 +37,4 @@ export const jobRepository = {
             },
         });
     },
-
 };
