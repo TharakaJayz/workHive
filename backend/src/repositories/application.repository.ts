@@ -1,5 +1,6 @@
-import { Application } from "../../generated/prisma/client";
+import { Application} from "../../generated/prisma/client";
 import { prisma } from "../lib/prisma";
+import { ApplicationStatus } from "../shared/enum";
 
 export const applicationRepository = {
 
@@ -12,5 +13,32 @@ export const applicationRepository = {
                 job:true
             }
         })
-    }
+    },
+    findApplicantsByJobId: (jobId: number) => {
+        return prisma.application.findMany({
+            where: {
+                job_id: jobId,
+            },
+            include: {
+                user: true, 
+            },
+            orderBy: {
+                date_applied: "desc",
+            },
+        });
+    },
+
+    updateStatus: (
+        applicationId: number,
+        status:ApplicationStatus
+      ): Promise<Application> => {
+        return prisma.application.update({
+          where: {
+            id: applicationId,
+          },
+          data: {
+            status,
+          },
+        });
+      },
 }

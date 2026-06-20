@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ApplicationStatus } from "../shared/enum";
 
 export const createApplicationSchema = z.object({
     job_id: z
@@ -19,3 +20,11 @@ export const createApplicationSchema = z.object({
 
 
 export type CreateApplicationInput = z.infer<typeof createApplicationSchema>
+
+export const updateApplicationSchema = z.object({
+    status: z.enum(ApplicationStatus, {
+      error: "Status must be PENDING, ACCEPTED, or REJECTED",
+    }),
+  });
+  
+  export type UpdateApplicationInput = z.infer<typeof updateApplicationSchema>;

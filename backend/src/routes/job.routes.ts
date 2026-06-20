@@ -19,12 +19,16 @@ router.post('', authenticate, dataValidator(createJobSchema),
 router.patch('/:id', authenticate, dataValidator(updateJobSchema), authorizeRoles(UserRole.EMPLOYER),
     jobController.update)
 
+router.get('/:id/applicants',authenticate,authorizeRoles(UserRole.EMPLOYER),jobController.getApplicantsByJobId);
+
+// get all jobs belong to a employer
+router.get("/employer/:empId",authenticate,authorizeRoles(UserRole.EMPLOYER),jobController.getAllJobsByEmployerId);
+
 //:id/applicants  -> GET to list applicants for a job
 // get single job
 router.get("/:id",jobController.getById);
 
-// get all jobs belong to a employer
-router.get("/employer/:empId",authenticate,authorizeRoles(UserRole.EMPLOYER),jobController.getAllJobsByEmployerId);
+
 // get all jobs
 router.get('',jobController.getAllJobs);
 

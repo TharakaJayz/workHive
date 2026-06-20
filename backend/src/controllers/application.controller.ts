@@ -18,5 +18,24 @@ export const applicationController = {
         } catch (error) {
             next(error);
         }
+    },
+    updateApplicationStatus: async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        const applicationId = Number(req.params.id);
+        try {
+            const result = await applicationService.updateApplicationStatus(
+                applicationId,req.body,
+                req.user.userId
+            )
+            res.status(200).json({
+                success: true,
+                data: result,
+            });
+        } catch (error) {
+            next(error);
+        }
     }
 }

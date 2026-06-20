@@ -23,3 +23,8 @@ export type ApplicationWithJob = Application & {
     job: Job;
   };
   
+
+  export type ApplicationWithUser = Application & {
+    user: User;
+  };
+
