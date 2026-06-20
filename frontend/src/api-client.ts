@@ -1,8 +1,8 @@
 import { signIn } from "next-auth/react";
-import { ApiResponse, ApiSuccess, UserRegisterResponse } from "./lib/types/api.types";
+import { ApiResponse, ApiSuccess, ApplicationWithJob, UserRegisterResponse } from "./lib/types/api.types";
 import { LoginFormData, RegisterFormData } from "./lib/validations/auth";
 import { CreateJobFormData } from "./lib/validations/job";
-import { Job } from "./lib/types/model.types";
+import { Application, Job } from "./lib/types/model.types";
 import { getSession } from "next-auth/react";
 
 
@@ -133,3 +133,34 @@ export const getAllJobs = async (
 
   return responseBody as ApiSuccess<Job[]>;
 };
+
+
+export const getAllApplicationByUser = async (
+) => {
+  const session = await getSession();
+  const token = session?.user?.accessToken;
+  const response = await fetch(
+    `${API_BASE_URL}/applications/mine`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    }
+  );
+  const responseBody = await response.json();
+
+  console.log("application response",responseBody)
+
+  if (!response.ok) {
+    console.log("error", responseBody);
+    throw new Error(responseBody.error.message);
+  }
+
+ 
+  return responseBody as ApiSuccess<ApplicationWithJob[]>;
+};
+
+
