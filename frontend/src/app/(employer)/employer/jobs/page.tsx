@@ -8,10 +8,11 @@ import CloseJobDialog from "@/components/custom/CloseJobDialog";
 import {
   updateJob,
   getApplicantsByJobId,
+  updateApplicationStatus,
 } from "@/api-client";
 import { Job } from "@/lib/types/model.types";
 import { updateAJob } from "@/store/slices/jobSlice";
-import { JobStatus } from "@/shared/enum";
+import { ApplicationStatus, JobStatus } from "@/shared/enum";
 import { toast } from "sonner";
 import ApplicantsDialog from "@/components/custom/ApplicantsDialog";
 import { ApplicationWithUser } from "@/lib/types/api.types";
@@ -28,6 +29,7 @@ export default function EmployerJobsPage() {
   const [applicantsJob, setApplicantsJob] = useState<Job | null>(null);
   const [applicants, setApplicants] = useState<ApplicationWithUser[]>([]);
   const [loadingApplicants, setLoadingApplicants] = useState(false);
+  const [updatingAppId, setUpdatingAppId] = useState<number | null>(null);
 
   const [closingJob, setClosingJob] = useState(false);
 
@@ -91,6 +93,49 @@ export default function EmployerJobsPage() {
       toast.error("Failed to load applicants");
     } finally {
       setLoadingApplicants(false);
+    }
+  };
+
+  const handleAcceptApplication = async (appId: number) => {
+    try {
+      setUpdatingAppId(appId);
+
+      await updateApplicationStatus(appId, ApplicationStatus.ACCEPTED);
+
+      setApplicants((prev) =>
+        prev.map((app) =>
+          app.id === appId
+            ? { ...app, status: ApplicationStatus.ACCEPTED }
+            : app
+        )
+      );
+
+      toast.success("Application accepted");
+    } catch (error) {
+      toast.error("Failed to accept application");
+    } finally {
+      setUpdatingAppId(null);
+    }
+  };
+  const handleRejectApplication = async (appId: number) => {
+    try {
+      setUpdatingAppId(appId);
+
+      await updateApplicationStatus(appId, ApplicationStatus.REJECTED);
+
+      setApplicants((prev) =>
+        prev.map((app) =>
+          app.id === appId
+            ? { ...app, status: ApplicationStatus.REJECTED }
+            : app
+        )
+      );
+
+      toast.success("Application rejected");
+    } catch (error) {
+      toast.error("Failed to reject application");
+    } finally {
+      setUpdatingAppId(null);
     }
   };
 
@@ -218,6 +263,9 @@ export default function EmployerJobsPage() {
           loading={loadingApplicants}
           applicants={applicants}
           onClose={() => setApplicantsJob(null)}
+          onAccept={handleAcceptApplication}
+          onReject={handleRejectApplication}
+          updatingAppId={updatingAppId}
         />
       )}
     </div>

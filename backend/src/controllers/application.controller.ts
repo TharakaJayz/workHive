@@ -26,10 +26,14 @@ export const applicationController = {
     ): Promise<void> => {
         const applicationId = Number(req.params.id);
         try {
+
+            
             const result = await applicationService.updateApplicationStatus(
-                applicationId,req.body,
+                applicationId,
+                req.body.status,
                 req.user.userId
             )
+            
             res.status(200).json({
                 success: true,
                 data: result,

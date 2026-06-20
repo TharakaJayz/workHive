@@ -240,7 +240,7 @@ export const updateApplicationStatus = async (
         "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",
       },
-      body: JSON.stringify(status),
+      body: JSON.stringify({status}),
     }
   );
 

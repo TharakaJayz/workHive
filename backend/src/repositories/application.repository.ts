@@ -27,6 +27,16 @@ export const applicationRepository = {
             },
         });
     },
+    findApplicationById: (id: number) => {
+        return prisma.application.findUnique({
+            where: {
+                id:id
+            },
+            include: {
+                user: true, 
+            }
+        });
+    },
 
     updateStatus: (
         applicationId: number,

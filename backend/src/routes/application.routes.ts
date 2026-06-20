@@ -11,7 +11,7 @@ const router = Router();
 
 router.get("/mine",authenticate,applicationController.findAllApplicationByUserId)
 
-router.patch("/:id/status",authenticate,dataValidator(updateApplicationSchema),authorizeRoles(UserRole.ADMIN),applicationController.updateApplicationStatus);
+router.patch("/:id/status",authenticate,dataValidator(updateApplicationSchema),authorizeRoles(UserRole.EMPLOYER),applicationController.updateApplicationStatus);
 
 
 export { router as applicationRouter };
