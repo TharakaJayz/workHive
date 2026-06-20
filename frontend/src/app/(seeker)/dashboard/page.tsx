@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { getAllApplicationByUser } from "@/api-client";
-import { Application, Job } from "@/lib/types/model.types";
 import { toast } from "sonner";
 import { ApplicationWithJob } from "@/lib/types/api.types";
-
 
 export default function SeekerDashboardPage() {
   const [applications, setApplications] = useState<ApplicationWithJob[]>([]);
@@ -15,14 +13,9 @@ export default function SeekerDashboardPage() {
     const fetchApplications = async () => {
       try {
         setLoading(true);
-
         const res = await getAllApplicationByUser();
-
-        const data = res.data;
-
-        setApplications(data);
+        setApplications(res.data);
       } catch (error: any) {
-        console.error("fetch applications error", error);
         toast.error(error.message || "Failed to load applications");
       } finally {
         setLoading(false);
@@ -35,58 +28,95 @@ export default function SeekerDashboardPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "ACCEPTED":
-        return "bg-green-100 text-green-700";
+        return "bg-green-100 text-green-800 border-green-200";
       case "REJECTED":
-        return "bg-red-100 text-red-700";
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return "bg-gray-100 text-gray-700";
+        return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
 
   if (loading) {
-    return <div>Loading applications...</div>;
+    return (
+      <div className="p-6 text-center text-gray-500">
+        Loading applications...
+      </div>
+    );
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">
-        My Applications
-      </h1>
+    <div className="p-6  w-[70%] mx-auto">
+      {/* HEADER */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">
+          My Applications
+        </h1>
+        <p className="text-sm text-gray-500">
+          Track all your job applications and their status
+        </p>
+      </div>
 
+      {/* EMPTY STATE */}
       {applications.length === 0 ? (
-        <div>No applications found</div>
+        <div className="text-center py-16 border rounded-lg bg-gray-50">
+          <p className="text-gray-500">No applications found</p>
+        </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border">
-            <thead className="bg-gray-50">
-              <tr className="border-b">
-                <th className="text-left p-3">Job Title</th>
-                <th className="text-left p-3">Company</th>
-                <th className="text-left p-3">Applied Date</th>
-                <th className="text-left p-3">Status</th>
+        <div className="overflow-x-auto rounded-lg border shadow-sm bg-white">
+          <table className="w-full text-sm">
+            {/* HEADER */}
+            <thead className="bg-gray-100 text-gray-700 text-left">
+              <tr>
+                <th className="p-4 font-semibold">Job</th>
+                <th className="p-4 font-semibold">Company</th>
+                <th className="p-4 font-semibold">Applied Date</th>
+                <th className="p-4 font-semibold">Status</th>
               </tr>
             </thead>
 
+            {/* BODY */}
             <tbody>
-              {applications.map((app) => (
-                <tr key={app.id} className="border-b">
-                  <td className="p-3 font-medium">
-                    {app.job.title}
+              {applications.map((app, index) => (
+                <tr
+                  key={app.id}
+                  className={`
+                    border-t transition
+                    hover:bg-gray-50
+                  `}
+                >
+                  {/* JOB */}
+                  <td className="p-4">
+                    <div className="font-medium text-gray-900">
+                      {app.job.title}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {app.job.location}
+                    </div>
                   </td>
 
-                  <td className="p-3">
+                  {/* COMPANY */}
+                  <td className="p-4 text-gray-700">
                     {app.job.company}
                   </td>
 
-                  <td className="p-3">
-                    {new Date(app.date_applied).toLocaleDateString()}
+                  {/* DATE */}
+                  <td className="p-4 text-gray-600">
+                    {new Date(app.date_applied).toLocaleDateString(
+                      "en-GB",
+                      {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      }
+                    )}
                   </td>
 
-                  <td className="p-3">
+                  {/* STATUS */}
+                  <td className="p-4">
                     <span
-                      className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
+                      className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
                         app.status
                       )}`}
                     >
