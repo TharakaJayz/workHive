@@ -129,7 +129,7 @@ export const jobController = {
 
             if (!req.params.empId || Number.isNaN(empId)) {
                 console.warn("[job.getAllJobsByEmployerId ⛔️] invalid employerId", {
-                    param: req.params.id,
+                    param: req.params.empId,
                 });
 
                 throw new AppError(
@@ -140,6 +140,35 @@ export const jobController = {
             }
 
             const result = await jobService.getAllJobsByEmployerId(empId, req.user.userId);
+
+            res.status(200).json({
+                success: true,
+                data: result,
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+    getApplicantsByJobId: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const jobId = Number(req.params.id);
+
+            if (!req.params.id || Number.isNaN(jobId)) {
+                console.warn("[job.getApplicantsByJobId ⛔️] invalid employerId", {
+                    param: req.params.id,
+                });
+
+                throw new AppError(
+                    400,
+                    "INVALID_JOB_ID",
+                    "Employer ID must be a valid number"
+                );
+            }
+
+            const result = await jobService.getApplicantsByJobId(jobId,req.user.userId);
+
+            
 
             res.status(200).json({
                 success: true,

@@ -1,4 +1,5 @@
 import { AppError } from "../lib/AppError";
+import { applicationRepository } from "../repositories/application.repository";
 import { jobRepository } from "../repositories/job.repository";
 import { userRepository } from "../repositories/user.repository";
 import { CreateJobInput, GetAllJobsInput, UpdateJobInput } from "../schemas/job.schema";
@@ -293,7 +294,63 @@ export const jobService = {
             count: jobs.length,
         });
         return jobs;
-    }
+    },
+
+    getApplicantsByJobId: async (
+        jobId: number,
+        userId: number,
+        role?: string | null
+    ) => {
+        console.log("[job.getApplicantsByJobId] start", {
+            jobId,
+            userId,
+        });
+    
+       
+        const job = await jobRepository.findById(jobId);
+    
+        if (!job) {
+            throw new AppError(404, "JOB_NOT_FOUND", "Job not found");
+        }
+    
+        
+        const user = await userRepository.findById(userId);
+    
+        if (!user) {
+            throw new AppError(404, "USER_NOT_FOUND", "User not found");
+        }
+    
+        const isAdmin = role === "ADMIN";
+        const isOwner = job.employer_id === userId;
+    
+        
+        if (!isAdmin && !isOwner) {
+            throw new AppError(
+                403,
+                "FORBIDDEN",
+                "You can only view applicants of your own jobs"
+            );
+        }
+    
+      
+        if (job.status === "DELETED") {
+            throw new AppError(
+                400,
+                "INVALID_OPERATION",
+                "Cannot access deleted job"
+            );
+        }
+    
+       
+        const applications = await applicationRepository.findApplicantsByJobId(jobId);
+    
+        console.log("[job.getApplicantsByJobId ✅] success", {
+            jobId,
+            count: applications.length,
+        });
+    
+        return applications;
+    },
 
 
 };
