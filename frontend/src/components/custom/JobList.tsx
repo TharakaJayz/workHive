@@ -8,7 +8,6 @@ import { JobCategory } from "@/shared/enum";
 import { useAppDispatch } from "@/store/hooks";
 import { setJobs } from "@/store/slices/jobSlice";
 
-
 interface JobListProps {
   jobs: Job[];
 }
@@ -47,6 +46,9 @@ export default function JobList({ jobs }: JobListProps) {
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
+      const isInactive = job.status === "CLOSED" || job.status === "DELETED";
+
+      if (isInactive) return false;
       const matchesSearch =
         debouncedSearch === "" ||
         job.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
