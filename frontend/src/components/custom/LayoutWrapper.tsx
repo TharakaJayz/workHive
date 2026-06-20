@@ -25,10 +25,10 @@ export default function LayoutWrapper({
     return <FullScreenLoader />
   }
   return (
-    <div className="w-full">
+    <div className="w-full  min-h-screen flex flex-col ">
       {!hideNavbar && <Navbar />}
       {/* Breadcrumb */}
-      {!hideNavbar && pathname !== "/" && (
+      {/* {!hideNavbar && pathname !== "/" && (
         <div className="px-6 py-3 hidden">
           <Breadcrumb>
             <BreadcrumbList>
@@ -63,8 +63,11 @@ export default function LayoutWrapper({
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-      )}
+      )} */}
+      <div className=" flex-1 flex flex-col">
+
       {children}
+      </div>
     </div>
   );
 }

@@ -67,14 +67,14 @@ export const jobController = {
                     "Job ID must be a valid number"
                 );
             }
-            
+
             // check  req is authenticated to allow ADMINS and OWNER can get flagged job details
             const authHeader = req.headers.authorization;
-            let userRole:string | null= null ;
-            let userId:number | null = null ;
-            if(authHeader?.startsWith("Bearer ")){
+            let userRole: string | null = null;
+            let userId: number | null = null;
+            if (authHeader?.startsWith("Bearer ")) {
                 const token = authHeader.split(" ")[1];
-                const data =  verifyToken(token);
+                const data = verifyToken(token);
                 userRole = data.role;
                 userId = data.userId;
             }
@@ -98,11 +98,11 @@ export const jobController = {
     getAllJobs: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const authHeader = req.headers.authorization;
-            let userRole:string | null= null ;
-            let userId:number | null = null ;
-            if(authHeader?.startsWith("Bearer ")){
+            let userRole: string | null = null;
+            let userId: number | null = null;
+            if (authHeader?.startsWith("Bearer ")) {
                 const token = authHeader.split(" ")[1];
-                const data =  verifyToken(token);
+                const data = verifyToken(token);
                 userRole = data.role;
                 userId = data.userId;
             }
@@ -117,7 +117,35 @@ export const jobController = {
                 success: true,
                 data: result,
             });
-            
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    getAllJobsByEmployerId: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const empId = Number(req.params.empId);
+
+            if (!req.params.empId || Number.isNaN(empId)) {
+                console.warn("[job.getAllJobsByEmployerId ⛔️] invalid employerId", {
+                    param: req.params.id,
+                });
+
+                throw new AppError(
+                    400,
+                    "INVALID_EMPLOYER_ID",
+                    "Employer ID must be a valid number"
+                );
+            }
+
+            const result = await jobService.getAllJobsByEmployerId(empId, req.user.userId);
+
+            res.status(200).json({
+                success: true,
+                data: result,
+            });
+
         } catch (error) {
             next(error);
         }

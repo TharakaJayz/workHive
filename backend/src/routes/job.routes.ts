@@ -22,6 +22,9 @@ router.patch('/:id', authenticate, dataValidator(updateJobSchema), authorizeRole
 //:id/applicants  -> GET to list applicants for a job
 // get single job
 router.get("/:id",jobController.getById);
+
+// get all jobs belong to a employer
+router.get("/employer/:empId",authenticate,authorizeRoles(UserRole.EMPLOYER),jobController.getAllJobsByEmployerId);
 // get all jobs
 router.get('',jobController.getAllJobs);
 

@@ -231,7 +231,7 @@ export const jobService = {
 
         const isFlagged = job.status === "FLAGGED";
 
-     
+
         // flagged job data only available for ADMIN or OWNER
         if (isFlagged && !(isAdmin || isOwner)) {
             console.warn("[job.getById ⛔️] flagged job access denied", {
@@ -252,30 +252,47 @@ export const jobService = {
 
     },
 
-    getAllJobs: async (filters: GetAllJobsInput,userId?: number | null, role?: string | null) => {
+    getAllJobs: async (filters: GetAllJobsInput, userId?: number | null, role?: string | null) => {
         console.log("[job.getAllJobs] start", filters);
         const isAdmin = role === "ADMIN";
         const jobs = await jobRepository.findAllJobs(filters);
-        const filteredJobs = jobs.filter((job) => {
+        // const filteredJobs = jobs.filter((job) => {
 
-            const isOwner = job.employer_id === userId;
+        //     const isOwner = job.employer_id === userId;
 
-            const isFlagged = job.status === "FLAGGED";
+        //     const isFlagged = job.status === "FLAGGED";
 
-            
-            // FLAGGED jobs only visible to ADMIN or OWNER
-            if (isFlagged && !(isAdmin || isOwner)) {
-                return false;
-            }
 
-            return true;
+        //     // FLAGGED jobs only visible to ADMIN or OWNER
+        //     if (isFlagged && !(isAdmin || isOwner)) {
+        //         return false;
+        //     }
+
+        //     return true;
+        // });
+
+        // console.log("[job.getAllJobs ✅] success", {
+        //     count: filteredJobs.length,
+        // });
+
+        return jobs;
+    },
+
+    getAllJobsByEmployerId: async (employerId: number, tokenUserId: number) => {
+        console.log("[job.getAllJobsByEmployerId] start employerId ", { employerId });
+        // Authorization check: ensure the authenticated user can only access their own employer resources
+        if (employerId !== tokenUserId) {
+            throw new AppError(
+                403,
+                "FORBIDDEN",
+                "You cannot access this resource"
+            );
+        }
+        const jobs = await jobRepository.findByEmployerId(employerId);
+        console.log("[job.getAllJobsByEmployerId ✅] success", {
+            count: jobs.length,
         });
-
-        console.log("[job.getAllJobs ✅] success", {
-            count: filteredJobs.length,
-        });
-
-        return filteredJobs;
+        return jobs;
     }
 
 
