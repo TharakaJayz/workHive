@@ -1,4 +1,4 @@
-import { JobCategory, JobStatus, JobType, UserRole } from "@/shared/enum";
+import { ApplicationStatus, JobCategory, JobStatus, JobType, UserRole } from "@/shared/enum";
 
 export interface User {
     email: string;
@@ -22,4 +22,15 @@ export interface Job {
     status: JobStatus;
     id: number;
     employer_id: number;
+}
+
+
+export interface Application {
+    id: number;
+    status:ApplicationStatus;
+    job_id: number;
+    resume_url: string;
+    cover_letter: string | null;
+    date_applied: Date;
+    user_id: number;
 }
