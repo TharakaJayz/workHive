@@ -1,55 +1,135 @@
 import { signIn } from "next-auth/react";
 import { ApiResponse, ApiSuccess, UserRegisterResponse } from "./lib/types/api.types";
 import { LoginFormData, RegisterFormData } from "./lib/validations/auth";
+import { CreateJobFormData } from "./lib/validations/job";
+import { Job } from "./lib/types/model.types";
+import { getSession } from "next-auth/react";
 
-export const API_BASE_URL = "http://localhost:8080/api/v1"
+
+ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 export const registerUser = async (formData: RegisterFormData) => {
-    const { confirmPassword, ...payload } = formData;
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-    });
-    const responseBody  = await response.json();
-    if (!response.ok) {
-        console.log("error", responseBody);
-        throw new Error(responseBody.error.message);
-       
+  const { confirmPassword, ...payload } = formData;
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  const responseBody = await response.json();
+  if (!response.ok) {
+    console.log("error", responseBody);
+    throw new Error(responseBody.error.message);
+
+  }
+
+  const result = await signIn("credentials", {
+    redirect: false,
+    email: formData.email,
+    password: formData.password,
+  });
+
+  console.log("NextAuth result", result);
+
+  if (result?.error) {
+    console.log("Account created, but failed to log in automatically. Please go to Login page.");
+  }
+
+
+  return responseBody as ApiSuccess<UserRegisterResponse>;
+
+}
+
+
+export const loginUser = async (formData: LoginFormData) => {
+  const result = await signIn("credentials", {
+    redirect: false,
+    email: formData.email,
+    password: formData.password,
+  });
+
+  if (result?.error) {
+    console.log("Failed to log in automatically. Please go to Login page.");
+    throw new Error("Invalid Credentials");
+  }
+
+  return result;
+}
+
+export const createNewJob = async (formData: CreateJobFormData) => {
+  const session = await getSession();
+  const token = session?.user?.accessToken;
+  const response = await fetch(`${API_BASE_URL}/jobs`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify(formData),
+  });
+  const responseBody = await response.json();
+  if (!response.ok) {
+    console.log("error", responseBody);
+    throw new Error(responseBody.error.message);
+
+  }
+  return responseBody as ApiSuccess<Job>;
+}
+
+
+
+export const getAllJobsByEmployerId = async (
+  employerId: number
+) => {
+  const session = await getSession();
+  const token = session?.user?.accessToken;
+
+  const response = await fetch(
+    `${API_BASE_URL}/jobs/employer/${employerId}`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && {
+          Authorization: `Bearer ${token}`,
+        }),
+      },
     }
+  );
 
-    const result = await signIn("credentials", {
-        redirect: false, 
-        email: formData.email,     
-        password: formData.password,
-      });
-
-      console.log("NextAuth result",result);
-
-      if (result?.error) {
-        console.log("Account created, but failed to log in automatically. Please go to Login page.");
-      } 
+  const responseBody = await response.json();
 
 
-    return responseBody as ApiSuccess<UserRegisterResponse> ;
+  if (!response.ok) {
+    console.log("error", responseBody);
+    throw new Error(responseBody.error.message);
+  }
 
-}
+  return responseBody as ApiSuccess<Job[]>;
+};
 
+export const getAllJobs = async (
+) => {
+  const response = await fetch(
+    `${API_BASE_URL}/jobs`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const responseBody = await response.json();
 
-export const loginUser = async (formData:LoginFormData) =>{
-    const result = await signIn("credentials", {
-        redirect: false, 
-        email: formData.email,  
-        password: formData.password,
-      });
+  if (!response.ok) {
+    console.log("error", responseBody);
+    throw new Error(responseBody.error.message);
+  }
 
-      if (result?.error) {
-        console.log("Failed to log in automatically. Please go to Login page.");
-        throw new Error("Invalid Credentials");
-      } 
-
-      return result ;
-}
+  return responseBody as ApiSuccess<Job[]>;
+};

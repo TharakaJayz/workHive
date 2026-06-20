@@ -1,9 +1,9 @@
 // src/app/api/auth/[...nextauth]/route.ts
-import { API_BASE_URL } from "@/api-client";
+
 import { ApiSuccess, UserLoginResponse } from "@/lib/types/api.types";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
