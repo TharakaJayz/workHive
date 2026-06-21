@@ -7,29 +7,47 @@ import { UserRole } from "../shared/enum";
 import { authenticate } from "../middlewares/auth.middleware";
 
 
-
 const router = Router();
 
-// create a job
-router.post('', authenticate, dataValidator(createJobSchema),
-    authorizeRoles(UserRole.EMPLOYER),
-    jobController.create
-)
-// update a job
-router.patch('/:id', authenticate, dataValidator(updateJobSchema), authorizeRoles(UserRole.EMPLOYER),
-    jobController.update)
+router.post(
+  "",
+  authenticate,
+  authorizeRoles(UserRole.EMPLOYER),
+  dataValidator(createJobSchema),
+  jobController.create
+);
 
-router.get('/:id/applicants',authenticate,authorizeRoles(UserRole.EMPLOYER),jobController.getApplicantsByJobId);
 
 // get all jobs belong to a employer
-router.get("/employer/:empId",authenticate,authorizeRoles(UserRole.EMPLOYER),jobController.getAllJobsByEmployerId);
+router.get(
+  "/employer/:empId",
+  authenticate,
+  authorizeRoles(UserRole.EMPLOYER),
+  jobController.getAllJobsByEmployerId
+);
 
-//:id/applicants  -> GET to list applicants for a job
+// get applicants of a job
+router.get(
+  "/:id/applicants",
+  authenticate,
+  authorizeRoles(UserRole.EMPLOYER),
+  jobController.getApplicantsByJobId
+);
+
+
+
 // get single job
-router.get("/:id",jobController.getById);
+router.get("/:id", jobController.getById);
 
+// update job
+router.patch(
+  "/:id",
+  authenticate,
+  authorizeRoles(UserRole.EMPLOYER),
+  dataValidator(updateJobSchema),
+  jobController.update
+);
 
-// get all jobs
-router.get('',jobController.getAllJobs);
+router.get("", jobController.getAllJobs);
 
 export { router as jobRouter };

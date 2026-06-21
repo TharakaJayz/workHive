@@ -9,7 +9,7 @@ export const jobController = {
         req: Request,
         res: Response,
         next: NextFunction
-    ): Promise<void> => {
+    ) => {
         try {
             const result = await jobService.create(req.body, req.user.userId);
             res.status(201).json({

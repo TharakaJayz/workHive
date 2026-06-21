@@ -16,6 +16,7 @@ import { ApplicationStatus, JobStatus } from "@/shared/enum";
 import { toast } from "sonner";
 import ApplicantsDialog from "@/components/custom/ApplicantsDialog";
 import { ApplicationWithUser } from "@/lib/types/api.types";
+import { getStatusColor } from "@/app/(seeker)/dashboard/page";
 
 export default function EmployerJobsPage() {
   const jobs = useAppSelector((state) => state.jobs.jobs);
@@ -47,12 +48,12 @@ export default function EmployerJobsPage() {
 
       dispatch(updateAJob(result.data));
 
-      toast.success("Job updated successfully");
+      toast.success("Job updated successfully",{position:"top-right"});
 
       setSelectedJob(null);
     } catch (error) {
       console.log(error);
-      toast.error("Failed to update job");
+      toast.error("Failed to update job",{position:"top-right"});
     }
   };
 
@@ -69,12 +70,12 @@ export default function EmployerJobsPage() {
 
       dispatch(updateAJob(result.data));
 
-      toast.success("Job closed successfully");
+      toast.success("Job closed successfully",{position:"top-right"});
 
       setJobToClose(null);
     } catch (error) {
       console.log(error);
-      toast.error("Failed to close job");
+      toast.error("Failed to close job",{position:"top-right"});
     } finally {
       setClosingJob(false);
     }
@@ -90,7 +91,7 @@ export default function EmployerJobsPage() {
       setApplicants(res.data);
     } catch (error) {
       console.log(error);
-      toast.error("Failed to load applicants");
+      toast.error("Failed to load applicants",{position:"top-right"});
     } finally {
       setLoadingApplicants(false);
     }
@@ -110,9 +111,9 @@ export default function EmployerJobsPage() {
         )
       );
 
-      toast.success("Application accepted");
+      toast.success("Application accepted",{position:"top-right"});
     } catch (error) {
-      toast.error("Failed to accept application");
+      toast.error("Failed to accept application",{position:"top-right"});
     } finally {
       setUpdatingAppId(null);
     }
@@ -131,9 +132,9 @@ export default function EmployerJobsPage() {
         )
       );
 
-      toast.success("Application rejected");
+      toast.success("Application rejected",{position:"top-right"});
     } catch (error) {
-      toast.error("Failed to reject application");
+      toast.error("Failed to reject application",{position:"top-right"});
     } finally {
       setUpdatingAppId(null);
     }
@@ -165,6 +166,7 @@ export default function EmployerJobsPage() {
                 <th className="p-4">Job</th>
                 <th className="p-4">Company</th>
                 <th className="p-4">Location</th>
+                <th className="p-4">Status</th>
                 <th className="p-4">Actions</th>
               </tr>
             </thead>
@@ -188,6 +190,15 @@ export default function EmployerJobsPage() {
                  
                   <td className="p-4 text-gray-600">
                     {job.location}
+                  </td>
+                  <td className={`p-4 text-gray-600`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                      job.status
+                    )}`}
+                  >
+                    {job.status}
+                  </span>
                   </td>
 
                   
