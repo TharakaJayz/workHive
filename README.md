@@ -1,49 +1,39 @@
-# workHive
+# Interview Project
 
-Setup & deployment (Netlify frontend -> local backend via ngrok)
+## Run backend with Docker
 
-1. Install dependencies
+1. Open a terminal and change to the backend folder:
 
-	- Backend: cd backend && npm install
-	- Frontend: cd frontend && npm install
+   ```bash
+   cd backend
+   ```
 
-2. Start the backend locally
+2. Copy the example environment file:
 
-	- From `backend`: `npm run dev` (or your usual start command). Backend listens on PORT (default 5000).
+   ```bash
+   cp .env.example .env.docker
+   ```
 
-3. Expose backend with ngrok
+3. Update `.env.docker` if needed, especially `JWT_SECRET`, `EMAIL_USER`, and `EMAIL_PASSWORD`.
 
-	- Run: `ngrok http 5000`
-	- Copy the HTTPS forwarding URL (e.g. `https://abc123.ngrok-free.app`)
+4. Build and start the backend and database containers:
 
-4. Configure backend CORS
+   ```bash
+   docker compose up --build
+   ```
 
-	- In `backend/.env` set `NGROK_URL` to the ngrok HTTPS URL (no path).
+5. After startup:
+   - Backend API is available at `http://localhost:8080`
+   - PostgreSQL is available on port `5433`
 
-5. Configure Netlify env var
+6. To stop and remove containers:
 
-	- In Netlify Project Settings → Build & deploy → Environment → Environment variables, set:
-		- `NEXT_PUBLIC_API_BASE_URL` = `<NGROK_HTTPS_URL>/api/v1` (example: `https://abc123.ngrok-free.app/api/v1`)
+   ```bash
+   docker compose down
+   ```
 
-6. Redeploy frontend on Netlify
+7. To remove the database volume and start clean:
 
-	- Trigger a redeploy (manual deploy or push to the connected branch). The deployed frontend will call your local backend through the tunnel.
-
-7. Test
-
-	- Open the Netlify site, perform actions that call the backend (login, list jobs). Confirm requests hit your local backend and ngrok shows the requests.
-
-8. Local dev without ngrok
-
-	- Use `NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api/v1` in `frontend/.env` for pure local testing.
-
-9. Commit helpers
-
-	- A `.env.example` is committed for backend and frontend; copy them to `.env` and fill secrets.
-
-10. Notes
-
-	- Backend reads `FRONTEND_URL` and `NGROK_URL` for CORS (see `backend/.env.example`).
-	- Keep ngrok running while testing the Netlify-deployed frontend.
-
-If you want, I can run the remaining edits: add frontend/.env.example and a root `.env.example` now.
+   ```bash
+   docker compose down -v
+   ```
