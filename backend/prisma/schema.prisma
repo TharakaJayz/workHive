@@ -72,7 +72,10 @@ model Application {
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   job  Job  @relation(fields: [job_id], references: [id], onDelete: Cascade)
-  // NEED TO ADD PROPER INTDEXS
+
+  @@index([user_id])
+  @@index([job_id])
+  @@index([status])
 }
 
 model Job {
@@ -90,5 +93,9 @@ model Job {
 
   user         User          @relation(fields: [employer_id], references: [id], onDelete: Cascade)
   applications Application[]
-  // NEED TO ADD PROPER INTDEXS
+
+  @@index([employer_id])
+  @@index([category])
+  @@index([location])
+  @@index([status])
 }
