@@ -9,6 +9,8 @@ import {
 
 import { ApplicationWithUser } from "@/lib/types/api.types";
 import { ApplicationStatus } from "@/shared/enum";
+import { useState } from "react";
+import ResumePreviewDialog from "./ResumePreviewDialog";
 
 interface Props {
   open: boolean;
@@ -32,18 +34,19 @@ export default function ApplicantsDialog({
   onAccept,
   onReject,
 }: Props) {
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [applicantName, setApplicantName] = useState("");
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="bg-white min-w-[95%] md:min-w-[80%] lg:min-w-[70%] max-h-[85vh] min-h-[80%] overflow-y-auto flex flex-col">
-        
-        {/* HEADER */}
+    
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-gray-800">
             Applicants - {jobTitle}
           </DialogTitle>
         </DialogHeader>
 
-        {/* LOADING STATE */}
+ 
         {loading ? (
           <div className="py-10 text-center text-gray-500">
             Loading applicants...
@@ -54,15 +57,13 @@ export default function ApplicantsDialog({
           </div>
         ) : (
           <div className="w-full mt-4 overflow-x-auto">
-            
-            {/* TITLE */}
+           
             <div className="text-primary text-lg font-semibold text-center mb-4">
               Applicants List
             </div>
 
-            {/* TABLE */}
+            
             <table className="w-full text-sm border rounded-md overflow-hidden bg-gray-100">
-              
               <thead className="bg-gray-100 text-gray-700 text-left">
                 <tr>
                   <th className="p-3">Name</th>
@@ -82,40 +83,35 @@ export default function ApplicantsDialog({
                       key={app.id}
                       className="border-t text-gray-700 hover:bg-gray-50 transition"
                     >
-                      {/* NAME */}
-                      <td className="p-3 font-medium">
-                        {app.user.full_name}
-                      </td>
+                     
+                      <td className="p-3 font-medium">{app.user.full_name}</td>
 
-                      {/* EMAIL */}
-                      <td className="p-3 text-gray-600">
-                        {app.user.email}
-                      </td>
+               
+                      <td className="p-3 text-gray-600">{app.user.email}</td>
 
-                      {/* DATE */}
+                 
                       <td className="p-3 text-gray-500">
                         {new Date(app.date_applied).toLocaleDateString()}
                       </td>
 
-                      {/* STATUS */}
+                    
                       <td className="p-3">
                         <span
                           className={`px-2 py-1 text-xs rounded-full font-medium ${
                             app.status === ApplicationStatus.ACCEPTED
                               ? "bg-green-100 text-green-700"
                               : app.status === ApplicationStatus.REJECTED
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-100 text-yellow-700"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
                           {app.status}
                         </span>
                       </td>
 
-                      {/* ACTIONS */}
+                    
                       <td className="p-3 flex gap-2 flex-wrap">
-                        
-                        {/* ACCEPT */}
+                      
                         <button
                           onClick={() => onAccept(app.id)}
                           disabled={
@@ -129,7 +125,7 @@ export default function ApplicantsDialog({
                           {isLoading ? "..." : "Accept"}
                         </button>
 
-                        {/* REJECT */}
+                        
                         <button
                           onClick={() => onReject(app.id)}
                           disabled={
@@ -143,21 +139,32 @@ export default function ApplicantsDialog({
                           {isLoading ? "..." : "Reject"}
                         </button>
 
-                        {/* RESUME */}
-                        <a
-                          href={app.resume_url}
-                          target="_blank"
+                      
+                        <button
+                          onClick={() => {
+                            setResumeUrl(app.resume_url);
+                            setApplicantName(app.user.full_name);
+                          }}
                           className="px-2 py-1 text-xs bg-primary text-white rounded
-                                     hover:bg-primary/90 transition"
+             hover:bg-primary/90 transition"
                         >
                           View Resume
-                        </a>
+                        </button>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
+            <ResumePreviewDialog
+              open={!!resumeUrl}
+              resumeUrl={resumeUrl ?? ""}
+              applicantName={applicantName}
+              onClose={() => {
+                setResumeUrl(null);
+                setApplicantName("");
+              }}
+            />
           </div>
         )}
       </DialogContent>
