@@ -11,6 +11,7 @@ import { createJobApplication } from "@/actions/application.actions";
 import { useAppSelector } from "@/store/hooks";
 import Link from "next/link";
 import { Briefcase, MapPin, DollarSign, ArrowLeft } from "lucide-react";
+import { createApplication } from "@/api-client";
 
 export default function ApplyJobPage() {
   const params = useParams();
@@ -65,13 +66,14 @@ export default function ApplyJobPage() {
 
     try {
       setSubmitting(true);
-      const res = await createJobApplication(data, user?.id!);
+      // const res = await createJobApplication(data, user?.id!);
+      const res = await createApplication(data);
 
       if (res.success) {
         toast.success("Application successfully registered!", { position: "top-right" });
         router.push("/dashboard");
       } else {
-        throw new Error(res.error);
+        throw new Error();
       }
     } catch (error: any) {
       console.error("Submission operational error", error);

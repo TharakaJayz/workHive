@@ -1,8 +1,8 @@
 import { AppError } from "../lib/AppError";
 import { applicationRepository } from "../repositories/application.repository";
 import { jobRepository } from "../repositories/job.repository";
-import { userRepository } from "../repositories/user.repository";
 import { CreateJobInput, GetAllJobsInput, UpdateJobInput } from "../schemas/job.schema";
+import { authService } from "./auth.service";
 
 export const jobService = {
     create: async (data: CreateJobInput, employerId: number) => {
@@ -12,7 +12,7 @@ export const jobService = {
         });
 
         //  Check employer exists
-        const employer = await userRepository.findById(employerId);
+        const employer = await authService.findById(employerId);
 
         if (!employer) {
             console.warn("[job.create ⛔️] employer not found", { employerId });
@@ -127,7 +127,7 @@ export const jobService = {
         }
 
         //  Check employer exists
-        const user = await userRepository.findById(userId);
+        const user = await authService.findById(userId);
 
         if (!user) {
             console.warn("[job.update ⛔️] user not found", { userId });
@@ -345,7 +345,7 @@ export const jobService = {
         }
 
 
-        const user = await userRepository.findById(userId);
+        const user = await authService.findById(userId);
 
         if (!user) {
             throw new AppError(404, "USER_NOT_FOUND", "User not found");
