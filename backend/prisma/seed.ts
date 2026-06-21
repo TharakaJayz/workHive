@@ -9,6 +9,13 @@ const prisma = new PrismaClient({
 async function main() {
   console.log("🌱 Seeding database...");
 
+  const userCount = await prisma.user.count();
+
+  if (userCount > 0) {
+    console.log("✅ Database already seeded, skipping seed.");
+    return;
+  }
+
   // 1. Create Employers (5)
   const employers = await Promise.all(
     Array.from({ length: 5 }).map((_, i) =>
@@ -16,7 +23,7 @@ async function main() {
         data: {
           email: `employer${i}@mail.com`,
           full_name: `Employer ${i}`,
-          password: "hashedpassword",
+          password: "12345678",
           role: UserRole.EMPLOYER,
         },
       })
@@ -30,7 +37,7 @@ async function main() {
         data: {
           email: `seeker${i}@mail.com`,
           full_name: `Seeker ${i}`,
-          password: "hashedpassword",
+          password: "12345678",
           role: UserRole.JOB_SEEKER,
         },
       })

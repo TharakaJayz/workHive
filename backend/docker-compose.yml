@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15
+    container_name: job_postgres
+    restart: always
+    env_file:
+      - .env.docker
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: job_backend
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .env.docker
+    ports:
+      - "8080:8080"
+    command: >
+      sh -c "
+      npx prisma migrate deploy &&
+      npm run seed &&
+      npm run start
+      "
+
+volumes:
+  pgdata:

@@ -6,7 +6,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "nodemon src/server.ts",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "seed": "ts-node prisma/seed.ts",
+        "start": "ts-node src/server.ts"
     },
     "prisma": {
         "seed": "ts-node prisma/seed.ts"
