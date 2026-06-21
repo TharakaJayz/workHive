@@ -6,6 +6,8 @@ import morgan from "morgan";
 import { apiRouter } from "./routes";
 import { AppError } from "./lib/AppError";
 import { errorHandler } from "./middlewares/error.middleware";
+import { rateLimiter } from "./middlewares/ratelimiter.middleware";
+
 
 const app = express();
 const PORT = process.env.PORT ?? 5000;
@@ -39,6 +41,8 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // RATE LIMITER
+
+app.use(rateLimiter);
 
 app.use("/api/v1", apiRouter);
 

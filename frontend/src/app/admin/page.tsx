@@ -62,7 +62,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* TABLE (DESKTOP) */}
-      <div className="hidden md:block overflow-x-auto rounded-lg border shadow-sm bg-white">
+      <div className="hidden md:block overflow-x-auto md:max-h-[600px]  rounded-lg border shadow-sm bg-white">
         <table className="w-full text-sm">
           <thead className="bg-gray-100 text-gray-700 text-left">
             <tr>
