@@ -3,7 +3,7 @@
 import { getAllJobs } from "@/api-client";
 import JobList from "@/components/custom/JobList";
 import { Job } from "@/lib/types/model.types";
-import { toast } from "sonner";
+
 
 
 export default async function Home() {
@@ -17,7 +17,7 @@ export default async function Home() {
     
     } catch (error) {
       console.log("error");
-      toast.error("Failed to fetch jobs",{position:"top-right"});
+     
     }
   
   return (
