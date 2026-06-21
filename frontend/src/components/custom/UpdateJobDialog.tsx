@@ -54,10 +54,10 @@ export default function UpdateJobDialog({
     try {
       setLoading(true);
       await onSubmit(data);
-      toast.success("Job updated successfully");
+      toast.success("Job updated successfully",{position:"top-right"});
       onClose();
     } catch (err: any) {
-      toast.error(err.message || "Update failed");
+      toast.error(err.message || "Update failed",{position:"top-right"});
     } finally {
       setLoading(false);
     }

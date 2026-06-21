@@ -45,10 +45,10 @@ export function PDFUploadInput({ label, error, onUploadSuccess }: PDFUploadInput
       
      
       onUploadSuccess(hostedUrl);
-      toast.success("Resume uploaded successfully!");
+      toast.success("Resume uploaded successfully!",{position:"top-right"});
     } catch (err: any) {
       setFileName(null);
-      toast.error(err.message || "Something went wrong during data upload");
+      toast.error(err.message || "Something went wrong during data upload",{position:"top-right"});
     } finally {
       setUploading(false);
     }

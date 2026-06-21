@@ -17,7 +17,7 @@ export default async function Home() {
     
     } catch (error) {
       console.log("error");
-      toast.error("Failed to fetch jobs");
+      toast.error("Failed to fetch jobs",{position:"top-right"});
     }
   
   return (

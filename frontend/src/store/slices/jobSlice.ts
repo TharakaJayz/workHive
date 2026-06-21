@@ -57,6 +57,9 @@ const jobSlice = createSlice({
         state.jobs[index] = updatedJob;
       }
     },
+    deleteAJob: (state, action: PayloadAction<number>) => {
+      state.jobs = state.jobs.filter((job) => job.id !== action.payload);
+    },
 
     setFilters: (state, action: PayloadAction<Filters>) => {
       state.filters = action.payload;
@@ -110,7 +113,8 @@ export const {
   setSalaryMin,
   setSalaryMax,
   clearJobs,
-  updateAJob
+  updateAJob,
+  deleteAJob
 } = jobSlice.actions;
 
 

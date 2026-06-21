@@ -32,7 +32,7 @@ export default function RegisterPage() {
       router.push("/");
     } catch (error: any) {
       console.log("register error", error);
-      toast.error(`Error:${error}`, { position: "top-right" });
+      toast.error(`${error}`, { position: "top-right" });
     } finally {
       setLoading(false);
     }

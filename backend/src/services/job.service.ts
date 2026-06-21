@@ -208,6 +208,37 @@ export const jobService = {
         return updatedJob;
     },
 
+    updateJobStatusByAdmin: async (jobId: number,
+        data: UpdateJobInput,) => {
+            console.log("[job.updateJobStatusByAdmin] start", {
+                jobId,
+                data
+
+            });
+
+            const job = await jobRepository.findById(jobId);
+
+            if (!job) {
+                console.warn("[job.updateJobStatusByAdmin ⛔️] job not found", { jobId });
+    
+                throw new AppError(
+                    404,
+                    "JOB_NOT_FOUND",
+                    "Job not found"
+                );
+            }
+
+            const updatedJob = await jobRepository.update(jobId, {
+                ...data,
+            });
+    
+            console.log("[job.updateJobStatusByAdmin ✅] success", {
+                jobId,
+            });
+    
+            return updatedJob;
+    },
+
     // get job by id 
     // admin and related owner can see flagged jobs
     getById: async (jobId: number, userId?: number | null, role?: string | null) => {
@@ -305,25 +336,25 @@ export const jobService = {
             jobId,
             userId,
         });
-    
-       
+
+
         const job = await jobRepository.findById(jobId);
-    
+
         if (!job) {
             throw new AppError(404, "JOB_NOT_FOUND", "Job not found");
         }
-    
-        
+
+
         const user = await userRepository.findById(userId);
-    
+
         if (!user) {
             throw new AppError(404, "USER_NOT_FOUND", "User not found");
         }
-    
+
         const isAdmin = role === "ADMIN";
         const isOwner = job.employer_id === userId;
-    
-        
+
+
         if (!isAdmin && !isOwner) {
             throw new AppError(
                 403,
@@ -331,8 +362,8 @@ export const jobService = {
                 "You can only view applicants of your own jobs"
             );
         }
-    
-      
+
+
         if (job.status === "DELETED") {
             throw new AppError(
                 400,
@@ -340,17 +371,40 @@ export const jobService = {
                 "Cannot access deleted job"
             );
         }
-    
-       
+
+
         const applications = await applicationRepository.findApplicantsByJobId(jobId);
-    
+
         console.log("[job.getApplicantsByJobId ✅] success", {
             jobId,
             count: applications.length,
         });
-    
+
         return applications;
     },
+
+
+    deletedAJobById:async(jobId:number)=>{
+        console.log("[job.deletedAJobById] start", {
+            jobId,
+
+        });
+
+        const job = await jobRepository.findById(jobId);
+
+        if (!job) {
+            console.warn("[job.deletedAJobById ⛔️] job not found", { jobId });
+
+            throw new AppError(
+                404,
+                "JOB_NOT_FOUND",
+                "Job not found"
+            );
+        }
+
+        const deletedJob = await jobRepository.delete(jobId);
+        return deletedJob;
+    }
 
 
 };

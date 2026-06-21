@@ -84,4 +84,10 @@ export const jobRepository = {
             data,
         });
     },
+
+    delete: (id: number): Promise<Job> => {
+        return prisma.job.delete({
+          where: { id },
+        });
+      },
 };

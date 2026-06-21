@@ -4,7 +4,7 @@ import { LoginFormData, RegisterFormData } from "./lib/validations/auth";
 import { CreateJobFormData, UpdateJobFormData } from "./lib/validations/job";
 import { Application, Job } from "./lib/types/model.types";
 import { getSession } from "next-auth/react";
-import { ApplicationStatus } from "./shared/enum";
+import { ApplicationStatus, JobStatus } from "./shared/enum";
 
 
  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
@@ -252,6 +252,65 @@ export const updateApplicationStatus = async (
   }
 
   return responseBody as ApiSuccess<Application>;
+};
+
+export const updateJobStatus = async (
+  jobId: number,
+  status:JobStatus
+) => {
+  const session = await getSession();
+  const token = session?.user?.accessToken;
+
+  const response = await fetch(
+    `${API_BASE_URL}/admin/jobs/${jobId}/flag`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify({status}),
+    }
+  );
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    console.log("error", responseBody);
+    throw new Error(responseBody.error.message);
+  }
+
+  return responseBody as ApiSuccess<Job>;
+};
+
+export const deleteJobById = async (
+  jobId: number,
+) => {
+  const session = await getSession();
+  const token = session?.user?.accessToken;
+
+  const response = await fetch(
+    `${API_BASE_URL}/admin/jobs/${jobId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify({status}),
+    }
+  );
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    console.log("error", responseBody);
+    throw new Error(responseBody.error.message);
+  }
+
+  return responseBody as ApiSuccess<Job>;
 };
 
 
