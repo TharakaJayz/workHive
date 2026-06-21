@@ -16,7 +16,8 @@ import { ApplicationStatus, JobStatus } from "@/shared/enum";
 import { toast } from "sonner";
 import ApplicantsDialog from "@/components/custom/ApplicantsDialog";
 import { ApplicationWithUser } from "@/lib/types/api.types";
-import { getStatusColor } from "@/app/(seeker)/dashboard/page";
+import { getStatusColor } from "@/lib/utils";
+
 
 export default function EmployerJobsPage() {
   const jobs = useAppSelector((state) => state.jobs.jobs);
