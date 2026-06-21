@@ -1,4 +1,4 @@
-import { Application} from "../../generated/prisma/client";
+import { Application, Prisma} from "../../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 import { ApplicationStatus } from "../shared/enum";
 
@@ -51,4 +51,24 @@ export const applicationRepository = {
           },
         });
       },
+
+      create: (
+        data: Prisma.ApplicationCreateInput
+    ): Promise<Application> => {
+        return prisma.application.create({
+            data,
+        });
+    },
+
+    findByUserAndJobId: (
+        userId: number,
+        jobId: number
+    ) => {
+        return prisma.application.findFirst({
+            where: {
+                user_id: userId,
+                job_id: jobId,
+            },
+        });
+    },
 }

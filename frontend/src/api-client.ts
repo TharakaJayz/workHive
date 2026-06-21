@@ -5,6 +5,7 @@ import { CreateJobFormData, UpdateJobFormData } from "./lib/validations/job";
 import { Application, Job } from "./lib/types/model.types";
 import { getSession } from "next-auth/react";
 import { ApplicationStatus, JobStatus } from "./shared/enum";
+import { CreateApplicationInput } from "./lib/validations/application";
 
 
  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
@@ -315,4 +316,33 @@ export const deleteJobById = async (
 
 
 
+
+export const createApplication = async (
+  formData: CreateApplicationInput
+) => {
+  const session = await getSession();
+  const token = session?.user?.accessToken;
+
+  const response = await fetch(
+    `${API_BASE_URL}/applications`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(formData),
+    }
+  );
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    console.log("error", responseBody);
+    throw new Error(responseBody.error.message);
+  }
+
+  return responseBody as ApiSuccess<Application>;
+};
 

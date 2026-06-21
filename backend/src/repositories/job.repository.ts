@@ -90,4 +90,6 @@ export const jobRepository = {
           where: { id },
         });
       },
+      
+
 };

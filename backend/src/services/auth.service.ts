@@ -71,4 +71,20 @@ export const authService = {
 
         return { user: safeUser, token };
     },
+
+    findById:async (id:number)=>{
+        const user = await userRepository.findById(id);
+        if (!user) {
+            console.warn("[auth.findById ⛔️] invalid userID ", {
+                id
+            });
+            throw new AppError(
+                401,
+                "INVALID_CREDENTIALS",
+                "Incorrect userID"
+            )
+        }
+
+        return user;
+    }
 };
