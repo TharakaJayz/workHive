@@ -30,7 +30,7 @@ To run the backend with Docker using the current configuration:
    ```
 
 
-## Backend  setup
+## Frontend  setup
 
 1. npm install 
 
