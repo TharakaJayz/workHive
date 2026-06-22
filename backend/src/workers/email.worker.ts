@@ -2,11 +2,8 @@ import "dotenv/config";
 import { workerData } from "worker_threads";
 import { createTransporter } from "../utils/mailer";
 
-
-
 async function sendEmail() {
     try {
-
         const transporter = createTransporter();
         const { email, fullName, jobTitle } = workerData;
 

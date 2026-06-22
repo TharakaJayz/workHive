@@ -28,3 +28,10 @@ To run the backend with Docker using the current configuration:
    ```bash
    docker compose down
    ```
+
+
+## Backend  setup
+
+1. npm install 
+
+2. npm run dev
